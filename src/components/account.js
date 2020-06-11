@@ -82,7 +82,7 @@ class account extends Component {
 		const authToken = localStorage.getItem('AuthToken');
 		axios.defaults.headers.common = { Authorization: `${authToken}` };
 		axios
-			.get('/user')
+			.get('/api/user')
 			.then((res) => {
 				console.log(res.data);
 				this.setState({
@@ -128,7 +128,7 @@ class account extends Component {
 		form_data.append('content',this.state.content);
 		axios.defaults.headers.common = { Authorization: `${authToken}` };
 		axios
-			.post('/user/image', form_data, {
+			.post('/api/user/image', form_data, {
 				headers: {
 					'content-type': 'multipart/form-data'
 				}
@@ -160,7 +160,7 @@ class account extends Component {
 			country: this.state.country
 		};
 		axios 
-			.post('/user', formRequest)
+			.post('/api/user', formRequest)
 			.then(() => {
 				this.setState({ buttonLoading: false })
 			})

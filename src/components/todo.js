@@ -19,7 +19,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { authMiddleWare } from '../util/auth';
 import { Typography, CardHeader } from '@material-ui/core';
-import SearchYELP from './searchYELP';
+import SearchYELP from './SearchYELP';
 
 const styles = (theme) => ({
 	content: {
@@ -32,7 +32,8 @@ const styles = (theme) => ({
 	toolbar: theme.mixins.toolbar,
 	title: {
 		marginLeft: theme.spacing(2),
-		flex: 1
+		flex: 1,
+		fontWeight: 'bold'
 	},
 	submitButton: {
 		display: 'block',
@@ -86,6 +87,9 @@ const styles = (theme) => ({
 		right: theme.spacing(1),
 		top: theme.spacing(1),
 		color: theme.palette.grey[500]
+	},
+	rateAlign: {
+		verticalAlign: 'textBottom'
 	}
 });
 
@@ -116,10 +120,11 @@ class todo extends Component {
 		this.deleteTodoHandler = this.deleteTodoHandler.bind(this);
 		this.handleEditClickOpen = this.handleEditClickOpen.bind(this);
 		this.handleViewOpen = this.handleViewOpen.bind(this);
+		this.handleRestName = this.handleRestName.bind(this);
 	}
 
-	requestTodos = () => axios.get('/todos');
-	requestCategories = () => axios.get('/categories');
+	requestTodos = () => axios.get('/api/todos');
+	requestCategories = () => axios.get('/api/categories');
 
 	handleChange = (e) => {
 		this.setState({
@@ -169,7 +174,7 @@ class todo extends Component {
 		axios.defaults.headers.common = { Authorization: `${authToken}` };
 		let todoId = data.todo.todoId;
 		axios 
-			.delete(`todo/${todoId}`)
+			.delete(`/api/todo/${todoId}`)
 			.then(() => {
 				window.location.reload();
 			})
@@ -199,6 +204,10 @@ class todo extends Component {
 			username: data.todo.username,
 			viewOpen: true
 		});
+	};
+
+	handleRestName(name) {
+		this.setState({ title: name });
 	};
 
 	render() {
@@ -249,13 +258,13 @@ class todo extends Component {
 			let options = {};
 			if (this.state.buttonType === 'Edit') {
 				options = {
-					url: `/todo/${this.state.todoId}`,
+					url: `/api/todo/${this.state.todoId}`,
 					method: 'put',
 					data: userReview
 				};
 			} else {
 				options = {
-					url: '/todo',
+					url: '/api/todo',
 					method: 'post',
 					data: userReview
 				};
@@ -281,11 +290,6 @@ class todo extends Component {
 			this.setState({open: false});
 		};
 
-		// const handleTest = () => {
-		// 	console.log(this.state.category.title);
-		// 	alert(this.state.category.title + this.state.location);
-		// };
-
 		if (this.state.uiLoading === true) {
 			return (
 				<main className={classes.content}>
@@ -308,7 +312,7 @@ class todo extends Component {
 							<Toolbar>
 								<IconButton edge="start" color="inherit" onClick={handleClose} aria-label="close"><CloseIcon /></IconButton>
 								<Typography variant="h6" className={classes.title}>
-									{this.state.buttonType === 'Edit' ? 'Edit Todo' : 'Create a new Todo'}
+									{this.state.buttonType === 'Edit' ? 'Edit review' : 'Create a new review'}
 								</Typography>
 								<Button 
 									autoFocus
@@ -361,7 +365,10 @@ class todo extends Component {
 									/>
 								</Grid>
 								<Grid item xs={12} md={2}>
-									<SearchYELP location={this.state.location} cat={this.state.category ? this.state.category.title : ""} />
+									<SearchYELP location={this.state.location} 
+												cat={this.state.category ? this.state.category.title : ""}
+												handleName={this.handleRestName}
+									/>
 									{/* <Button color="primary" onClick={handleTest}>Search</Button> */}
 								</Grid>
 
@@ -385,7 +392,9 @@ class todo extends Component {
 								<Grid item xs={12} md={6}>
 									<Box display="flex" flexDirection="row" p={1} borderColor="transparent">
 										<Box p={1}><Typography component="legend">Rating:</Typography></Box>
-										<Box p={1}><Rating name="simple-rating" value={this.state.rate} /></Box>
+										<Box p={1}><Rating name="simple-rating" 
+															value={this.state.rate} 
+															onChange={(e, newValue) => {this.setState({ rate: newValue })}} /></Box>
 									</Box>
 								</Grid>
 								<Grid item xs={12}>
@@ -422,14 +431,11 @@ class todo extends Component {
 										<Typography color="textSecondary" className={classes.time}>
 											{dayjs(todo.createdAt).fromNow()}
 										</Typography>
-										<Typography variant="h5" component="h2">
+										<Typography variant="h6" component="h2">
 											{todo.title}
 										</Typography>
 										<Typography className={classes.pos} color="textSecondary">
-											<LocationOnIcon style={{verticalAlign:'bottom'}} />{todo.location}
-										</Typography>
-										<Typography>
-											<Rating name="rate" value={todo.rate} precision={0.5} size="small" readOnly />
+											<LocationOnIcon style={{verticalAlign:'bottom'}} />{todo.location} | <Rating name="rate" className={classes.rateAlign} value={todo.rate} precision={0.5} size="small" readOnly />
 										</Typography>
 										<Typography variant="body2" component="p">
 											{`${todo.body.substring(0,65)}`}
