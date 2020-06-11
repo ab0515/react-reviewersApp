@@ -92,7 +92,7 @@ class home extends Component {
 		const authToken = localStorage.getItem('AuthToken');
 		axios.defaults.headers.common = { Authorization: `${authToken}`};
 		axios 
-			.get('/user')
+			.get('/api/user')
 			.then((res) => {
 				console.log(res.data);
 				this.setState({

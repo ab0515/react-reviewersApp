@@ -1,8 +1,9 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import withStyles from '@material-ui/core/styles/withStyles';
 
-import { IconButton, TextField, Grid, Typography, Dialog } from '@material-ui/core';
+import { IconButton, Typography, Dialog, CardActionArea } from '@material-ui/core';
+import { Card, CardContent } from '@material-ui/core';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
 import SearchIcon from '@material-ui/icons/Search';
@@ -10,6 +11,7 @@ import CloseIcon from '@material-ui/icons/Close';
 
 import { authMiddleWare } from '../util/auth';
 import axios from 'axios';
+import { yelpApiKEY } from '../util/configYELP';
 
 const styles = (theme) => ({
 	root: {
@@ -24,151 +26,99 @@ const styles = (theme) => ({
 	content: {
 		flexGrow: 1,
 		padding: theme.spacing(3),
+	},
+	cards: {
+		margin: theme.spacing(1)
 	}
 });
 
-class searchYELP extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			searchOpen: false,
-			bizName: '',
-			bizLocation: this.props.location,
-			bizCategory: this.props.cat,
-			bizData: '',
-			errors: []
-		};
-	}
+const SearchYELP = (props) => {
+	const {classes} = props;
+	const [inputs, setInputs] = useState({});
+	const [searchOpen, setSearchOpen] = useState(props.searchOpen);
+	const [bizName, setBizName] = useState('');
+	const [restaurants, setRestaurants] = useState([]);
+	const [errors, setErrors] = useState([]);
 
-	handleChange = (e) => {
-		this.setState({
-			[e.target.name]: e.target.value
+	useEffect(() => {
+		setInputs({
+			location: props.location,
+			category: props.cat
 		});
+	}, [props.location, props.cat]);
+
+	const handleSearch = (e) => {
+		e.preventDefault();
+		authMiddleWare(props.history);
+
+		// const authToken = localStorage.getItem('AuthToken');
+		axios.defaults.headers.common = { Authorization: `Bearer ${yelpApiKEY}`};
+		axios
+			.get(`/search?term=${inputs.category}&location=${inputs.location}&sort-by=best_match`)
+			.then((res) => {
+				setRestaurants(res.data.businesses);
+				setSearchOpen(true);
+			})
+			.catch(err => {
+				console.log(err);
+				setErrors(err.response.text);
+			});
 	};
 
-	render() {
-		const { searchOpen, errors } = this.state;
-		const {classes} = this.props;
+	const handleClose = () => {
+		setSearchOpen(false);
+	};
 
-		const handleOnClick = (e) => {
-			e.preventDefault();
-			console.log('search clicked');
-			// authMiddleWare(this.props.history);
-			// const authToken = localStorage.getItem('AuthToken');
-			// axios.defaults.headers.common = { Authorization: `${authToken}`};
-
-			// axios 
-			// 	.get('/biz')
-			// 	.then((res) => {
-			// 		this.setState({
-			// 			bizData: res.data 
-			// 		});
-			// 	})
-			// 	.catch((err) => {
-			// 		console.log(err);
-			// 		this.setState({
-			// 			errors: err.response.data
-			// 		})
-			// 	});
-		};
-		// const DialogTitle = withStyles(styles)((props) => {
-		// 	const { children, classes, onClose, ...other } = props;
-		// 	return (
-		// 		<MuiDialogTitle disableTypography className={classes.root} {...other}>
-		// 			<Typography variant="h6">{children}</Typography>
-		// 			{onClose ? (
-		// 				<IconButton aria-label="close" className={classes.closeButton} onClick={onClose}><CloseIcon /></IconButton>
-		// 			) : null}
-		// 		</MuiDialogTitle>
-		// 	);
-		// });
-
-		// const DialogContent = withStyles((theme) => ({
-		// 	viewRoot: {
-		// 		padding: theme.spacing(2)
-		// 	}
-		// }))(MuiDialogContent);
-
-		const handleSearch = (e) => {
-			e.preventDefault();
-			
-			authMiddleWare(this.props.history);
-			const authToken = localStorage.getItem('AuthToken');
-			axios.defaults.headers.common = { Authorization: `${authToken}`};
-
-			axios 
-				.get('/biz')
-				.then((res) => {
-					console.log(res.data);
-				})
-				.catch((err) => {
-					console.log(err);
-				});
-		};
-
-		const handleClose = () => {
-			this.setState({
-				searchOpen: false,
-				bizName: '',
-				bizLocation: ''
-			});
-		};
-
-		const DialogTitle = withStyles(styles)((props) => {
-			const { children, classes, onClose, ...other } = props;
-			return (
-				<MuiDialogTitle disableTypography className={classes.root} {...other}>
-					<Typography variant="h6">{children}</Typography>
-					{onClose ? (
-						<IconButton aria-label="close" className={classes.closeButton} onClick={onClose}><CloseIcon /></IconButton>
-					) : null}
-				</MuiDialogTitle>
-			);
-		});
-
-		const DialogContent = withStyles((theme) => ({
-			viewRoot: {
-				padding: theme.spacing(2)
-			}
-		}))(MuiDialogContent);
-
-		return (
-			<main className={classes.content}>
-				<IconButton aria-label="search" onClick={handleSearch}><SearchIcon /></IconButton>
-
-				<Dialog open={searchOpen} onClose={handleClose} aria-labelledby="form-dialog-title">
-					<DialogTitle id="dialog-title" onClose={handleClose}>{this.state.cat}</DialogTitle>
-					{/* <form noValidate>
-						<Grid item xs={12} md={5}>
-							<TextField 
-								name="bizName" 
-								value={this.state.bizName} 
-								id="bizName"
-								label="Eatery"
-								onChange={this.handleChange}
-								helperText={errors.bizName}
-								error={errors.bizName ? true : false}
-							/>
-						</Grid>
-						<Grid item xs={12} md={5}>
-							<TextField 
-								name="bizLocation" 
-								value={this.state.bizLocation} 
-								id="bizLocation"
-								label="Where"
-								helperText={errors.bizLocation}
-								onChange={this.handleChange}
-								error={errors.bizLocation ? true : false}
-							/>
-						</Grid>
-						<Grid item xs={12} md={2}>
-							<Button color="primary" onClick={handleOnClick}>Search</Button>
-						</Grid>
-					</form> */}
-				</Dialog>
-			</main>
-		);
+	const handleClick = (name) => {
+		props.handleName(name);
+		setSearchOpen(false);
 	}
+
+	const DialogTitle = withStyles(styles)((props) => {
+		const { children, classes, onClose, ...other } = props;
+		return (
+			<MuiDialogTitle disableTypography className={classes.root} {...other}>
+				<Typography variant="h6">{children}</Typography>
+				{onClose ? (
+					<IconButton aria-label="close" className={classes.closeButton} onClick={onClose}><CloseIcon /></IconButton>
+				) : null}
+			</MuiDialogTitle>
+		);
+	});
+
+	const DialogContent = withStyles((theme) => ({
+		viewRoot: {
+			padding: theme.spacing(2)
+		}
+	}))(MuiDialogContent);
+
+	return (
+		<main className={classes.content}>
+			<IconButton aria-label="search" onClick={handleSearch}><SearchIcon /></IconButton>
+
+			<Dialog open={searchOpen} 
+					onClose={handleClose} 
+					aria-labelledby="form-dialog-title"
+					scroll="paper"
+			>
+				<DialogTitle id="dialog-title" onClose={handleClose}>Restaurants</DialogTitle>
+				<DialogContent dividers="paper">
+					{
+						restaurants.map(rest => 
+							<Card key={rest.id} className={classes.cards}>
+								<CardActionArea onClick={() => handleClick(rest.name)}>
+									<CardContent>
+										<Typography variant="subtitle1">{rest.name}</Typography>
+										<Typography variant="body1">{rest.rating} | {rest.price}</Typography>
+									</CardContent>
+								</CardActionArea>
+							</Card>
+						)
+					}
+				</DialogContent>
+			</Dialog>
+		</main>
+	);
 };
 
-export default withStyles(styles)(searchYELP);
+export default withStyles(styles)(SearchYELP);
