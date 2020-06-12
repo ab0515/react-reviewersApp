@@ -1,3 +1,0 @@
-module.exports = {
-	yelpApiKEY: "L9OspXNHj8KOcgBF_eMXztdWP2CYGvaZT8dLzn7LEcC_qJbvBJNgRohleYQSmaQuw0kfFwBF5onLCpUCj5zxZJCi1WEhhHzAvCtYnXbqtH8-k5zuUQ358UfWjNWXXnYx"
-};
