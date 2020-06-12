@@ -41,7 +41,7 @@ const styles = (theme) => ({
 	},
 	avatar: {
 		height: 110,
-		width: 100,
+		width: 110,
 		flexShrink: 0,
 		flexGrow: 0,
 		marginTop: 20
@@ -130,7 +130,7 @@ class home extends Component {
 					<AppBar position="fixed" className={classes.appBar}>
 						<Toolbar>
 							<Typography variant="h6" noWrap>
-								TodoApp
+								Reviewers
 							</Typography>
 						</Toolbar>
 					</AppBar>
@@ -152,14 +152,14 @@ class home extends Component {
 						</center>
 						<Divider />
 						<List>
-							<ListItem button key="Todo" onClick={this.loadTodoPage}>
+							<ListItem button key="Dashboard" onClick={this.loadTodoPage}>
 								<ListItemIcon><NotesIcon /></ListItemIcon>
-								<ListItemText primary="Todo" />
+								<ListItemText primary="Dashboard" />
 							</ListItem>
 
 							<ListItem button key="Account" onClick={this.loadAccountPage}>
 								<ListItemIcon><AccountBoxIcon /></ListItemIcon>
-								<ListItemText primary="Account" />
+								<ListItemText primary="My Account" />
 							</ListItem>
 
 							<ListItem button key="Logout" onClick={this.logoutHandler}>

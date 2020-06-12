@@ -10,10 +10,10 @@ import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 const theme = createMuiTheme({
   palette: {
     primary: {
-      light: '#33c9dc',
-      main: '#FF5722',
-      dark: '#d50000',
-      contrastText: '#fff'
+      light: '#cce3de',
+      main: '#1b4965',
+      dark: '#283d3b',
+      contrastText: '#f7ede2'
     }
   }
 });

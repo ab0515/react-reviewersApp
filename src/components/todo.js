@@ -90,7 +90,12 @@ const styles = (theme) => ({
 	},
 	rateAlign: {
 		verticalAlign: 'textBottom'
-	}
+	},
+	body: {
+		paddingRight: theme.spacing(4),
+		paddingTop: theme.spacing(2),
+		paddingBottom: theme.spacing(2)
+	},
 });
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -139,6 +144,7 @@ class todo extends Component {
 		
 		try {
 			const [reviewData, catData] = await axios.all([this.requestTodos(), this.requestCategories()]);
+			console.log(reviewData.data);
 			this.setState({
 				reviews: reviewData.data,
 				categories: catData.data.map((option) => {
@@ -153,19 +159,6 @@ class todo extends Component {
 		} catch (err) {
             console.log(err.message);
         }
-		// axios
-		// 	.get('/todos')
-		// 	.then((res) => {
-		// 		console.log(res.data);
-		// 		this.setState({
-		// 			reviews: res.data,
-		// 			uiLoading: false
-		// 		});
-		// 	})
-		// 	.catch((err) => {
-		// 		console.log(err);
-		// 		this.setState({errMsg: 'Error while retrieving data'});
-		// 	});
 	};
 
 	deleteTodoHandler(data) {
@@ -201,7 +194,6 @@ class todo extends Component {
 			body: data.todo.body,
 			rate: data.todo.rate,
 			location: data.todo.location,
-			username: data.todo.username,
 			viewOpen: true
 		});
 	};
@@ -324,7 +316,8 @@ class todo extends Component {
 								</Button>
 							</Toolbar>
 						</AppBar>
-						
+
+						{/* Review Form		 */}
 						<form className={classes.form} noValidate>
 							<Grid container spacing={3}>
 								<Grid item xs={12} md={6}>
@@ -403,12 +396,12 @@ class todo extends Component {
 										required
 										fullWidth 
 										id="todoDetails"
-										label="Review"
+										label="Review (max. 500 words)"
 										name="body"
 										autoComplete="todoDetails"
 										multiline
-										rows={25}
-										rowsMax={25}
+										rows={20}
+										rowsMax={20}
 										helperText={errors.body}
 										value={this.state.body}
 										error={errors.body ? true : false}
@@ -419,44 +412,41 @@ class todo extends Component {
 						</form>
 					</Dialog>
 
+					{/* Display reviews on dashboard */}
 					<Grid container spacing={2}>
 						{this.state.reviews.map((todo) => (
-							<Grid item xs={12} sm={6} key={todo.todoId}>
+							<Grid item xs={12} key={todo.todoId}>
 								<Card className={classes.root} variant="outlined">
-									{/* <CardHeader
-										title={todo.title}
-										subheader={dayjs(todo.createdAt).fromNow()}
-									/> */}
-									<CardContent>
-										<Typography color="textSecondary" className={classes.time}>
-											{dayjs(todo.createdAt).fromNow()}
-										</Typography>
-										<Typography variant="h6" component="h2">
-											{todo.title}
-										</Typography>
-										<Typography className={classes.pos} color="textSecondary">
-											<LocationOnIcon style={{verticalAlign:'bottom'}} />{todo.location} | <Rating name="rate" className={classes.rateAlign} value={todo.rate} precision={0.5} size="small" readOnly />
-										</Typography>
-										<Typography variant="body2" component="p">
-											{`${todo.body.substring(0,65)}`}
-										</Typography>
-									</CardContent>
-									<CardActions>
-										<Button size="small" color="primary" onClick={() => this.handleViewOpen({todo})}>
-											SEE MORE
-										</Button>
-										{/* <Button size="small" color="primary" onClick={() => this.handleEditClickOpen({todo})}>
-											Edit
-										</Button>
-										<Button size="small" color="primary" onClick={() => this.deleteTodoHandler({todo})}>
-											Delete
-										</Button> */}
-									</CardActions>
+										<Grid container>
+											<Grid item xs={12} md={4}>
+													<CardContent>
+														<Typography color="textSecondary" className={classes.time}>
+															{dayjs(todo.createdAt).fromNow()}
+														</Typography>
+														<Typography variant="h6" component="h2">{todo.title}</Typography>
+														<Typography className={classes.pos} color="textSecondary">
+															<LocationOnIcon style={{verticalAlign:'bottom'}} />{todo.location} | <Rating name="rate" className={classes.rateAlign} value={todo.rate} precision={0.5} size="small" readOnly />
+														</Typography>
+														<Typography variant="body1">{todo.writtenBy}</Typography>
+												</CardContent>
+												<CardActions>
+													<Button size="small" color="primary" onClick={() => this.handleViewOpen({todo})}>
+														SEE MORE
+													</Button>
+												</CardActions>
+											</Grid>
+											<Grid item xs={12} md={8} className={classes.body}>
+												<Typography variant="body2" component="p">
+													{`${todo.body}`}
+												</Typography>
+											</Grid>
+										</Grid>
 								</Card>
 							</Grid>
 						))}
 					</Grid>
 
+					{/* Review expansion */}
 					<Dialog 
 						onClose={handleViewClose}
 						aria-labelledby="customized-dialog-title"
