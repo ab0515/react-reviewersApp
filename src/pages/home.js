@@ -5,9 +5,6 @@ import Account from '../components/account';
 import Todo from '../components/todo';
 
 import Drawer from '@material-ui/core/Drawer';
-import AppBar from '@material-ui/core/AppBar';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Toolbar from '@material-ui/core/Toolbar';
 import List from '@material-ui/core/List';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
@@ -126,14 +123,14 @@ class home extends Component {
 		} else {
 			return (
 				<div className={classes.root}>
-					<CssBaseline />
+					{/* <CssBaseline />
 					<AppBar position="fixed" className={classes.appBar}>
 						<Toolbar>
 							<Typography variant="h6" noWrap>
 								Reviewers
 							</Typography>
 						</Toolbar>
-					</AppBar>
+					</AppBar> */}
 					<Drawer
 						className={classes.drawer}
 						variant="permanent"

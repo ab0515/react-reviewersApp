@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 
 import withStyles from '@material-ui/core/styles/withStyles';
 
-import { Button, Dialog, Box, AppBar, Toolbar } from '@material-ui/core';
+import { Button, Dialog, Box, AppBar, Toolbar, Avatar } from '@material-ui/core';
 import { IconButton, Slide, TextField, InputAdornment } from '@material-ui/core';
 import { Grid, Card, CardActions, CardContent } from '@material-ui/core';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -62,7 +62,8 @@ const styles = (theme) => ({
 		transform: 'scale(0.8)'
 	},
 	pos: {
-		fontSize: '14px'
+		fontSize: '14px',
+		fontWeight: 'bold',
 	},
 	time: {
 		fontSize: '12px'
@@ -89,13 +90,26 @@ const styles = (theme) => ({
 		color: theme.palette.grey[500]
 	},
 	rateAlign: {
-		verticalAlign: 'textBottom'
+		paddingLeft: 10,
 	},
 	body: {
 		paddingRight: theme.spacing(4),
 		paddingTop: theme.spacing(2),
 		paddingBottom: theme.spacing(2)
 	},
+	horizontal: {
+		display: 'flex',
+		alignItems: 'center',
+		paddingTop: 5,
+	},
+	bolderText: {
+		fontWeight: 600,
+	},
+	padTop: {
+		display: 'flex',
+		alignItems: 'center',
+		paddingTop: 20,
+	}
 });
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -282,6 +296,53 @@ class todo extends Component {
 			this.setState({open: false});
 		};
 
+		const DashboardDisplay = () => {
+			{/* Display reviews on dashboard */}
+			return (
+				<Grid container spacing={2}>
+					{this.state.reviews.map((todo) => (
+						<Grid item xs={12} key={todo.todoId}>
+							<Card className={classes.root} variant="outlined">
+									<Grid container>
+										<Grid item xs={12} md={4}>
+											<CardContent>
+												<Typography color="textSecondary" className={classes.time}>
+													{dayjs(todo.createdAt).fromNow()}
+												</Typography>
+												<Typography variant="h6" component="h2">{todo.title}</Typography>
+												
+												<div className={classes.horizontal}>
+													<Typography className={classes.pos} color="textSecondary">
+														<LocationOnIcon style={{verticalAlign:'bottom'}} />{todo.location} |
+													</Typography>
+													<Rating name="rate" className={classes.rateAlign} value={todo.rate} precision={0.5} size="small" readOnly />
+												</div>
+													
+												<div className={classes.padTop}>
+													{/* <Avatar src={todo.profileUrl} alt={todo.writtenBy} /> */}
+													<Typography variant="subtitle1">By {todo.writtenBy}</Typography>
+													{/* <Typography variant="subtitle2"></Typography> */}
+												</div>
+											</CardContent>
+											{/* <CardActions>
+												<Button size="small" color="primary" onClick={() => this.handleViewOpen({todo})}>
+													SEE MORE
+												</Button>
+											</CardActions> */}
+										</Grid>
+										<Grid item xs={12} md={8} className={classes.body}>
+											<Typography className={classes.bolderText} variant="body2" component="p">
+												{`${todo.body}`}
+											</Typography>
+										</Grid>
+									</Grid>
+							</Card>
+						</Grid>
+					))}
+				</Grid> 
+			);
+		};
+
 		if (this.state.uiLoading === true) {
 			return (
 				<main className={classes.content}>
@@ -344,6 +405,7 @@ class todo extends Component {
 										id="todoLocation"
 										label="Location"
 										name="location"
+										autoComplete="off"
 										helperText={errors.location}
 										value={this.state.location}
 										error={errors.location ? true : false}
@@ -387,6 +449,7 @@ class todo extends Component {
 										<Box p={1}><Typography component="legend">Rating:</Typography></Box>
 										<Box p={1}><Rating name="simple-rating" 
 															value={this.state.rate} 
+															precision={0.5}
 															onChange={(e, newValue) => {this.setState({ rate: newValue })}} /></Box>
 									</Box>
 								</Grid>
@@ -412,42 +475,10 @@ class todo extends Component {
 						</form>
 					</Dialog>
 
-					{/* Display reviews on dashboard */}
-					<Grid container spacing={2}>
-						{this.state.reviews.map((todo) => (
-							<Grid item xs={12} key={todo.todoId}>
-								<Card className={classes.root} variant="outlined">
-										<Grid container>
-											<Grid item xs={12} md={4}>
-													<CardContent>
-														<Typography color="textSecondary" className={classes.time}>
-															{dayjs(todo.createdAt).fromNow()}
-														</Typography>
-														<Typography variant="h6" component="h2">{todo.title}</Typography>
-														<Typography className={classes.pos} color="textSecondary">
-															<LocationOnIcon style={{verticalAlign:'bottom'}} />{todo.location} | <Rating name="rate" className={classes.rateAlign} value={todo.rate} precision={0.5} size="small" readOnly />
-														</Typography>
-														<Typography variant="body1">{todo.writtenBy}</Typography>
-												</CardContent>
-												<CardActions>
-													<Button size="small" color="primary" onClick={() => this.handleViewOpen({todo})}>
-														SEE MORE
-													</Button>
-												</CardActions>
-											</Grid>
-											<Grid item xs={12} md={8} className={classes.body}>
-												<Typography variant="body2" component="p">
-													{`${todo.body}`}
-												</Typography>
-											</Grid>
-										</Grid>
-								</Card>
-							</Grid>
-						))}
-					</Grid>
+					<DashboardDisplay />
 
 					{/* Review expansion */}
-					<Dialog 
+					{/* <Dialog 
 						onClose={handleViewClose}
 						aria-labelledby="customized-dialog-title"
 						open={viewOpen}
@@ -456,6 +487,7 @@ class todo extends Component {
 					>
 						<DialogTitle id="customized-dialog-title" onClose={handleViewClose}>
 							{this.state.title}
+
 						</DialogTitle>
 						<DialogContent dividers>
 							<TextField
@@ -472,7 +504,7 @@ class todo extends Component {
 								}}
 							/>
 						</DialogContent>
-					</Dialog>
+					</Dialog> */}
 				</main>
 			);
 		}
