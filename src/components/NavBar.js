@@ -9,7 +9,9 @@ const style = (theme) => ({
 		display: 'flex',
 	},
 	appBar: {
-		zIndex: theme.zIndex.drawer + 1
+		zIndex: theme.zIndex.drawer + 1,
+		background: 'transparent',
+		boxShadow: 'none',
 	},
 });
 

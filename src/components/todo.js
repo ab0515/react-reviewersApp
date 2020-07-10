@@ -259,7 +259,8 @@ class todo extends Component {
 				title: this.state.title,
 				body: this.state.body,
 				rate: this.state.rate,
-				location: this.state.location
+				location: this.state.location,
+				category: this.state.category
 			};
 			let options = {};
 			if (this.state.buttonType === 'Edit') {
