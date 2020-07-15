@@ -20,6 +20,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { authMiddleWare } from '../util/auth';
 import { Typography, CardHeader } from '@material-ui/core';
 import SearchYELP from './SearchYELP';
+import Filters from './Filters';
 
 const styles = (theme) => ({
 	content: {
@@ -134,12 +135,14 @@ class todo extends Component {
 			buttonType: '',
 			viewOpen: false,
 			categories: '',
-			category: ''
+			category: '',
+			sortBy: 1
 		};
 		this.deleteTodoHandler = this.deleteTodoHandler.bind(this);
 		this.handleEditClickOpen = this.handleEditClickOpen.bind(this);
 		this.handleViewOpen = this.handleViewOpen.bind(this);
 		this.handleRestName = this.handleRestName.bind(this);
+		this.onSorting = this.onSorting.bind(this);
 	}
 
 	requestTodos = () => axios.get('/api/todos');
@@ -158,7 +161,7 @@ class todo extends Component {
 		
 		try {
 			const [reviewData, catData] = await axios.all([this.requestTodos(), this.requestCategories()]);
-			console.log(reviewData.data);
+			
 			this.setState({
 				reviews: reviewData.data,
 				categories: catData.data.map((option) => {
@@ -215,6 +218,28 @@ class todo extends Component {
 	handleRestName(name) {
 		this.setState({ title: name });
 	};
+
+	onSorting(e) {
+		let date = 'createdAt';
+		let rate = 'rate';
+		let option = e.target.value;
+		let sortedReviews = [...this.state.reviews].map((a,b) => {
+			if (option === 1 || option === 2) {
+				return (
+					option === 1 ? ( a[date] >= b[date] ? 1 : -1 ) :
+						( a[date] <= b[date] ? 1 : -1 )
+				);
+			} 
+			else if (option === 3 || option === 4) {
+				return (
+					option === 2 ? ( a[rate] >= b[rate] ? -1 : 1 ) :
+						( a[rate] <= b[rate] ? -1 : 1 )
+				);
+			}
+		});
+		this.setState({ reviews: sortedReviews });
+		this.setState({ sortBy: option });
+	}
 
 	render() {
 		const DialogTitle = withStyles(styles)((props) => {
@@ -300,61 +325,62 @@ class todo extends Component {
 		const DashboardDisplay = () => {
 			{/* Display reviews on dashboard */}
 			return (
-				<Grid container spacing={2}>
-					{this.state.reviews.map((todo) => (
-						<Grid item xs={12} key={todo.todoId}>
-							<Card className={classes.root} variant="outlined">
-									<Grid container>
-										<Grid item xs={12} md={4}>
-											<CardContent>
-												<Typography color="textSecondary" className={classes.time}>
-													{dayjs(todo.createdAt).fromNow()}
-												</Typography>
-												<Typography variant="h6" component="h2">{todo.title}</Typography>
-												
-												<div className={classes.horizontal}>
-													<Typography className={classes.pos} color="textSecondary">
-														<LocationOnIcon style={{verticalAlign:'bottom'}} />{todo.location} |
+				<div>
+					<Filters sortBy={this.state.sortBy} onSorting={this.onSorting} />
+					<Grid container spacing={2}>
+						{this.state.reviews.map((todo) => (
+							<Grid item xs={12} key={todo.todoId}>
+								<Card className={classes.root} variant="outlined">
+										<Grid container>
+											<Grid item xs={12} md={4}>
+												<CardContent>
+													<Typography color="textSecondary" className={classes.time}>
+														{dayjs(todo.createdAt).fromNow()}
 													</Typography>
-													<Rating name="rate" className={classes.rateAlign} value={todo.rate} precision={0.5} size="small" readOnly />
-												</div>
+													<Typography variant="h6" component="h2">{todo.title}</Typography>
 													
-												<div className={classes.padTop}>
-													{/* <Avatar src={todo.profileUrl} alt={todo.writtenBy} /> */}
-													<Typography variant="subtitle1">By {todo.writtenBy}</Typography>
-													{/* <Typography variant="subtitle2"></Typography> */}
-												</div>
-											</CardContent>
-											{/* <CardActions>
-												<Button size="small" color="primary" onClick={() => this.handleViewOpen({todo})}>
-													SEE MORE
-												</Button>
-											</CardActions> */}
+													<div className={classes.horizontal}>
+														<Typography className={classes.pos} color="textSecondary">
+															<LocationOnIcon style={{verticalAlign:'bottom'}} />{todo.location} |
+														</Typography>
+														<Rating name="rate" className={classes.rateAlign} value={parseFloat(todo.rate)} precision={0.5} size="small" readOnly />
+													</div>
+														
+													<div className={classes.padTop}>
+														{/* <Avatar src={todo.profileUrl} alt={todo.writtenBy} /> */}
+														<Typography variant="subtitle1">By {todo.writtenBy}</Typography>
+														{/* <Typography variant="subtitle2"></Typography> */}
+													</div>
+												</CardContent>
+												{/* <CardActions>
+													<Button size="small" color="primary" onClick={() => this.handleViewOpen({todo})}>
+														SEE MORE
+													</Button>
+												</CardActions> */}
+											</Grid>
+											<Grid item xs={12} md={8} className={classes.body}>
+												<Typography className={classes.bolderText} variant="body2" component="p">
+													{`${todo.body}`}
+												</Typography>
+											</Grid>
 										</Grid>
-										<Grid item xs={12} md={8} className={classes.body}>
-											<Typography className={classes.bolderText} variant="body2" component="p">
-												{`${todo.body}`}
-											</Typography>
-										</Grid>
-									</Grid>
-							</Card>
-						</Grid>
-					))}
-				</Grid> 
+								</Card>
+							</Grid>
+						))}
+					</Grid> 
+				</div>
 			);
 		};
 
 		if (this.state.uiLoading === true) {
 			return (
 				<main className={classes.content}>
-					<div className={classes.toolbar} />
 					{this.state.uiLoading && <CircularProgress size={150} className={classes.uiProgress} />}
 				</main>
 			)
 		} else {
 			return (
 				<main className={classes.content}>
-					<div className={classes.toolbar}/>
 					<IconButton 
 						className={classes.floatingButton}
 						color="primary"

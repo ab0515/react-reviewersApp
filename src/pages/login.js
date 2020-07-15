@@ -14,6 +14,11 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import axios from 'axios';
 
 const styles = (theme) => ({
+	input: {
+		"&:-webkit-autofill": {
+		  WebkitBoxShadow: "0 0 0 1000px white inset",
+		}
+	},
 	paper: {
 		marginTop: theme.spacing(8),
 		display: 'flex',
@@ -124,7 +129,10 @@ class login extends Component {
 							id="email"
 							label="Email Address"
 							name="email"
-							autoComplete="email"
+							inputProps={{
+								className: classes.input
+							}}
+							autoComplete="off"
 							autoFocus 
 							helperText={errors.email}
 							error={errors.email ? true : false}
@@ -139,7 +147,10 @@ class login extends Component {
 							label="Password"
 							name="password"
 							type="password"
-							autoComplete="current-password"
+							inputProps={{
+								className: classes.input
+							}}
+							autoComplete="off"
 							helperText={errors.password}
 							error={errors.password ? true : false}
 							onChange={this.handleChange}
